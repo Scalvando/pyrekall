@@ -2,6 +2,7 @@ from pyrekall.models.common import AbstractWrapper
 from pyrekall.models.processes import Process
 from pyrekall.models.services import Service
 from pyrekall.models.registry import Registry
+from pyrekall.models.connections import Connection
 from pyrekall.models.user import User
 
 import pyrekall.helpers.usability
@@ -115,6 +116,13 @@ class Sample(AbstractWrapper):
         for u, v, f in self.session.plugins.users().GenerateUsers():
             users.append(User(u, v, f))
         return users
+    
+    def get_connections(self):
+        """
+        This function is used for the purpose of getting connections
+        :return: a list of connections
+        """
+        return [Connection(c) for c in self.session.plugins.netstat().collect()]
 
     def summary(self, all=False):
         summary = {

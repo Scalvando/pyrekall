@@ -8,7 +8,7 @@ import abc
 
 class AbstractWrapper(object):
     """
-    This class serves as an abstract wrapper class and should be used by any class which wraps the pyrekall API. In
+    This class serrekall python 3ves as an abstract wrapper class and should be used by any class which wraps the pyrekall API. In
     doing so, a degree of simplicity is achieved.
     """
     __metaclass__ = abc.ABCMeta

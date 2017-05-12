@@ -56,9 +56,9 @@ class Process(pyrekall.models.common.AbstractWrapper):
         self.md5 = hex(pyrekall.helpers.crypto.md5(self.raw_pe))
 
         # Other fields
-        self.sub_system_major_version = int(process.SubSystemMajorVersion)
-        self.sub_system_minor_version = int(process.SubSystemMinorVersion)
-        self.sub_system_version = int(process.SubSystemVersion)
+        #self.sub_system_major_version = int(process.SubSystemMajorVersion)
+        #self.sub_system_minor_version = int(process.SubSystemMinorVersion)
+        #self.sub_system_version = int(process.SubSystemVersion)
 
         super(Process, self).post_init()
 

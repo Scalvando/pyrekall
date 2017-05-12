@@ -17,6 +17,7 @@ parser.add_argument('-A', '--all', dest='all', action='store_true', help='list e
 parser.add_argument('-X', '--sample', dest='sample', action='store_true', help="list high-level information about the memory sample")
 parser.add_argument('-S', '--services', dest='services', action='store_true', help="list running services")
 parser.add_argument('-U', '--users', dest='users', action='store_true', help="list users")
+parser.add_argument('-C', '--connections', dest='connections', action='store_true', help="list connections")
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
 parser.add_argument('--include-handles', dest='include_handles', action='store_true', help='include handles in process summaries')
@@ -36,7 +37,8 @@ if __name__ == "__main__":
         args.sample,
         args.services,
         args.processes,
-        args.users
+        args.users,
+        args.connections
     ]):
         parser.print_help()
         sys.exit(1)
@@ -61,6 +63,9 @@ if __name__ == "__main__":
 
         if args.services:
             result['services'] = list(map(lambda x: x.summary(), sample.get_services()))
+
+        if args.connections:
+            result['connections'] = [x.summary() for x in sample.get_connections()]
 
     if args.quiet:
         sys.exit(0)
