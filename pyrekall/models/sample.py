@@ -9,6 +9,7 @@ from pyrekall.models.driver import Driver
 from pyrekall.models.ssdt import SSDT
 from pyrekall.models.connections import Connection
 from pyrekall.models.thread import Thread
+from pyrekall.models.token import Token
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -164,6 +165,13 @@ class Sample(AbstractWrapper):
         :return: a list of threads
         """
         return [Thread(t) for t in self.session.plugins.thrdscan().collect()]
+    
+    def get_tokens(self):
+        """
+        This function is used for the purpose of getting tokens
+        :return: a list of tokens
+        """
+        return [Token(t) for t in self.session.plugins.tokens().collect()]
 
     def summary(self, all=False):
         summary = {

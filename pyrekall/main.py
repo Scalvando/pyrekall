@@ -23,6 +23,7 @@ parser.add_argument('-F', '--files', dest='files', action='store_true', help="li
 parser.add_argument('-D', '--drivers', dest='drivers', action='store_true', help="list drivers")
 parser.add_argument('-Y', '--service_descriptors', dest='ssdt', action='store_true', help="list service descriptor table contents")
 parser.add_argument('-T', '--threads', dest='threads', action='store_true', help="list threads")
+parser.add_argument('-K', '--tokens', dest='tokens', action='store_true', help="list tokens")
 
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
@@ -49,7 +50,8 @@ if __name__ == "__main__":
         args.drivers,
         args.ssdt,
         args.connections,
-        args.threads
+        args.threads,
+        args.tokens
     ]):
         parser.print_help()
         sys.exit(1)
@@ -93,7 +95,8 @@ if __name__ == "__main__":
         if args.threads:
             result['threads'] = [x.summary() for x in sample.get_threads()]
 
-
+        if args.tokens:
+            result['tokens'] = [x.summary() for x in sample.get_tokens()]
 
     if args.quiet:
         sys.exit(0)
