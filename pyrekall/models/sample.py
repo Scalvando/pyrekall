@@ -3,13 +3,14 @@ from pyrekall.models.processes import Process
 from pyrekall.models.services import Service
 from pyrekall.models.registry import Registry
 from pyrekall.models.user import User
-from pyrekall.models.mft_entry import MFT_Entry
+from pyrekall.models.mft_entry import MFTEntry
 from pyrekall.models.file import File
 from pyrekall.models.driver import Driver
 from pyrekall.models.ssdt import SSDT
 from pyrekall.models.connections import Connection
 from pyrekall.models.thread import Thread
 from pyrekall.models.token import Token
+from pyrekall.models.unlinked_dll import UnlinkedDLL
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -135,7 +136,7 @@ class Sample(AbstractWrapper):
         This function is used for the purpose of getting MFT entries
         :return: a list of MFT entries
         """
-        return [MFT_Entry(e) for e in self.session.plugins.mftdump().collect()]
+        return [MFTEntry(e) for e in self.session.plugins.mftdump().collect()]
     
     def get_files(self):
         """
@@ -172,6 +173,14 @@ class Sample(AbstractWrapper):
         :return: a list of tokens
         """
         return [Token(t) for t in self.session.plugins.tokens().collect()]
+    
+    def get_unlinked_dlls(self):
+        """
+        This function is used for the purpose of getting unlinked DLLs
+        :return: a list of unlinked DLLs
+        """
+        return [UnlinkedDLL(d) for d in self.session.plugins.ldrmodules().collect() if 'divider' not in d]
+
 
     def summary(self, all=False):
         summary = {

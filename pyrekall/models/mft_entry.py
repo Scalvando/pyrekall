@@ -1,12 +1,12 @@
 import pyrekall.models.common
 
-class MFT_Entry(pyrekall.models.common.AbstractWrapper):
+class MFTEntry(pyrekall.models.common.AbstractWrapper):
     """
     This class is used to represent MFT entries.
     """
 
     def __init__(self, mft_entry):
-        super(MFT_Entry, self).__init__()
+        super(MFTEntry, self).__init__()
 
         self.mft = mft_entry['MFT']
         #self.mft_entry = str(mft_entry['mft_entry'])
