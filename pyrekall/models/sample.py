@@ -8,6 +8,7 @@ from pyrekall.models.file import File
 from pyrekall.models.driver import Driver
 from pyrekall.models.ssdt import SSDT
 from pyrekall.models.connections import Connection
+from pyrekall.models.thread import Thread
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -157,12 +158,12 @@ class Sample(AbstractWrapper):
         """
         return [SSDT(d) for d in self.session.plugins.ssdt().collect() if 'divider' not in d]
     
-    def get_sockets(self):
+    def get_threads(self):
         """
-        This function is used for the purpose of getting active sockets
-        :return: a list of active sockets
+        This function is used for the purpose of getting threads
+        :return: a list of threads
         """
-        return [Socket(s) for s in self.session.plugins.sockets().collect()]
+        return [Thread(t) for t in self.session.plugins.thrdscan().collect()]
 
     def summary(self, all=False):
         summary = {

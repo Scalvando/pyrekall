@@ -21,7 +21,8 @@ parser.add_argument('-C', '--connections', dest='connections', action='store_tru
 parser.add_argument('-M', '--mft', dest='mft', action='store_true', help="list MFT entries")
 parser.add_argument('-F', '--files', dest='files', action='store_true', help="list files")
 parser.add_argument('-D', '--drivers', dest='drivers', action='store_true', help="list drivers")
-parser.add_argument('-T', '--service_descriptors', dest='ssdt', action='store_true', help="list service descriptor table contents")
+parser.add_argument('-Y', '--service_descriptors', dest='ssdt', action='store_true', help="list service descriptor table contents")
+parser.add_argument('-T', '--threads', dest='threads', action='store_true', help="list threads")
 
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
@@ -47,7 +48,8 @@ if __name__ == "__main__":
         args.files,
         args.drivers,
         args.ssdt,
-        args.connections
+        args.connections,
+        args.threads
     ]):
         parser.print_help()
         sys.exit(1)
@@ -87,6 +89,10 @@ if __name__ == "__main__":
         
         if args.ssdt:
             result['ssdt'] = [x.summary() for x in sample.get_ssdt()]
+        
+        if args.threads:
+            result['threads'] = [x.summary() for x in sample.get_threads()]
+
 
 
     if args.quiet:
