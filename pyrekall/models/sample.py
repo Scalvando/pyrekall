@@ -2,8 +2,12 @@ from pyrekall.models.common import AbstractWrapper
 from pyrekall.models.processes import Process
 from pyrekall.models.services import Service
 from pyrekall.models.registry import Registry
-from pyrekall.models.connections import Connection
 from pyrekall.models.user import User
+from pyrekall.models.mft_entry import MFT_Entry
+from pyrekall.models.file import File
+from pyrekall.models.driver import Driver
+from pyrekall.models.ssdt import SSDT
+from pyrekall.models.connections import Connection
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -122,7 +126,43 @@ class Sample(AbstractWrapper):
         This function is used for the purpose of getting connections
         :return: a list of connections
         """
-        return [Connection(c) for c in self.session.plugins.netstat().collect()]
+        return [Connection(c) for c in self.session.plugins.netscan().collect()]
+    
+    def get_mft(self):
+        """
+        This function is used for the purpose of getting MFT entries
+        :return: a list of MFT entries
+        """
+        return [MFT_Entry(e) for e in self.session.plugins.mftdump().collect()]
+    
+    def get_files(self):
+        """
+        This function is used for the purpose of getting pooled files
+        :return: a list of files
+        """
+        return [File(f) for f in self.session.plugins.filescan().collect()]
+
+    def get_drivers(self):
+        """
+        This function is used for the purpose of getting drivers
+        :return: a list of drivers
+        """
+        return [Driver(d) for d in self.session.plugins.driverscan().collect()]
+
+    def get_ssdt(self):
+        """
+        This function is used for the purpose of getting the System Service Descriptor 
+        Table
+        :return: a list of SSDT entries
+        """
+        return [SSDT(d) for d in self.session.plugins.ssdt().collect() if 'divider' not in d]
+    
+    def get_sockets(self):
+        """
+        This function is used for the purpose of getting active sockets
+        :return: a list of active sockets
+        """
+        return [Socket(s) for s in self.session.plugins.sockets().collect()]
 
     def summary(self, all=False):
         summary = {

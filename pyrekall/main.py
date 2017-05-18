@@ -18,6 +18,11 @@ parser.add_argument('-X', '--sample', dest='sample', action='store_true', help="
 parser.add_argument('-S', '--services', dest='services', action='store_true', help="list running services")
 parser.add_argument('-U', '--users', dest='users', action='store_true', help="list users")
 parser.add_argument('-C', '--connections', dest='connections', action='store_true', help="list connections")
+parser.add_argument('-M', '--mft', dest='mft', action='store_true', help="list MFT entries")
+parser.add_argument('-F', '--files', dest='files', action='store_true', help="list files")
+parser.add_argument('-D', '--drivers', dest='drivers', action='store_true', help="list drivers")
+parser.add_argument('-T', '--service_descriptors', dest='ssdt', action='store_true', help="list service descriptor table contents")
+
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
 parser.add_argument('--include-handles', dest='include_handles', action='store_true', help='include handles in process summaries')
@@ -38,6 +43,10 @@ if __name__ == "__main__":
         args.services,
         args.processes,
         args.users,
+        args.mft,
+        args.files,
+        args.drivers,
+        args.ssdt,
         args.connections
     ]):
         parser.print_help()
@@ -66,6 +75,19 @@ if __name__ == "__main__":
 
         if args.connections:
             result['connections'] = [x.summary() for x in sample.get_connections()]
+
+        if args.mft:
+            result['mft'] = [x.summary() for x in sample.get_mft()]
+        
+        if args.files:
+            result['files'] = [x.summary() for x in sample.get_files()]
+        
+        if args.drivers:
+            result['drivers'] = [x.summary() for x in sample.get_drivers()]
+        
+        if args.ssdt:
+            result['ssdt'] = [x.summary() for x in sample.get_ssdt()]
+
 
     if args.quiet:
         sys.exit(0)
