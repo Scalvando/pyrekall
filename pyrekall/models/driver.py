@@ -1,4 +1,5 @@
 import pyrekall.models.common
+import pyrekall.helpers.usability
 
 class Driver(pyrekall.models.common.AbstractWrapper):
     """
@@ -13,7 +14,7 @@ class Driver(pyrekall.models.common.AbstractWrapper):
         self.ptr_count = int(driver[2])
         self.hnd_count = int(driver[3])
         self.driver_start = hex(driver[4])
-        self.size = int(driver[5]) or None
+        self.size = pyrekall.helpers.usability.sizeof_fmt(driver[5])
         self.service_key = str(driver[6]) or driver[6]
         self.path = str(driver[7]) or driver[7]
 

@@ -11,6 +11,7 @@ from pyrekall.models.connections import Connection
 from pyrekall.models.thread import Thread
 from pyrekall.models.token import Token
 from pyrekall.models.unlinked_dll import UnlinkedDLL
+from pyrekall.models.kernel_module import KernelModule
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -181,6 +182,12 @@ class Sample(AbstractWrapper):
         """
         return [UnlinkedDLL(d) for d in self.session.plugins.ldrmodules().collect() if 'divider' not in d]
 
+    def get_kernel_modules(self):
+        """
+        This function is used for the purpose of getting loaded kernel modules
+        :return: a list of kernel modules
+        """
+        return [KernelModule(m) for m in self.session.plugins.modules().collect()]
 
     def summary(self, all=False):
         summary = {
