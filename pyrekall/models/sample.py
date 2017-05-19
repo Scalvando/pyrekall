@@ -3,6 +3,8 @@ from pyrekall.models.processes import Process
 from pyrekall.models.services import Service
 from pyrekall.models.registry import Registry
 from pyrekall.models.user import User
+from pyrekall.models.dnscache import DnsCache
+from pyrekall.models.symlink import SymLink
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -115,6 +117,20 @@ class Sample(AbstractWrapper):
         for u, v, f in self.session.plugins.users().GenerateUsers():
             users.append(User(u, v, f))
         return users
+
+    def get_dns_cache(self):
+        """
+        This function is used to identify DNS cache records
+        :return: a list of DNS cache records
+        """
+        return [DnsCache(record) for record in self.session.plugins.dns_cache().collect()]
+
+    def get_symlinks(self):
+        """
+        This function is used to identify DNS cache records
+        :return: a list of DNS cache records
+        """
+        return [SymLink(record) for record in self.session.plugins.symlinkscan().collect()]
 
     def summary(self, all=False):
         summary = {
