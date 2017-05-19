@@ -12,6 +12,7 @@ from pyrekall.models.thread import Thread
 from pyrekall.models.token import Token
 from pyrekall.models.unlinked_dll import UnlinkedDLL
 from pyrekall.models.kernel_module import KernelModule
+from pyrekall.models.timer import Timer
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -188,6 +189,13 @@ class Sample(AbstractWrapper):
         :return: a list of kernel modules
         """
         return [KernelModule(m) for m in self.session.plugins.modules().collect()]
+    
+    def get_kernel_timers(self):
+        """
+        This function is used for the purpose of getting kernel timers and their associated module DPCs.
+        :return: a list of kernel timers and their associated module DPCs
+        """
+        return [Timer(t) for t in self.session.plugins.timers().collect()]
 
     def summary(self, all=False):
         summary = {
