@@ -196,6 +196,13 @@ class Sample(AbstractWrapper):
         :return: a list of kernel timers and their associated module DPCs
         """
         return [Timer(t) for t in self.session.plugins.timers().collect()]
+    
+    def get_registry_keys(self):
+        """
+        This function is used for the purpose of getting all of the registry keys in all hives
+        :return: a list of registry keys
+        """
+        return [RegistryKey(r, k) for r, k in self.session.plugins.printkey(recursive=True).list_keys()]
 
     def summary(self, all=False):
         summary = {
