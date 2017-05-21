@@ -1,4 +1,6 @@
-import hodgepodge.cryptography.hashing
+from cryptography.hazmat.primitives import hashes
+
+import pyrekall.helpers.crypto
 import datetime
 import pefile
 import enum
@@ -29,46 +31,37 @@ class PE(pefile.PE):
 
         self.timestamp = datetime.datetime.fromtimestamp(self.FILE_HEADER.TimeDateStamp).strftime("%Y-%m-%d %H:%M:%S")
 
+        self.md5, self.sha1, self.sha256 = pyrekall.helpers.crypto.compute_checksum(
+            data, hashes.MD5(), hashes.SHA1(), hashes.SHA256()
+        )
+
     def is_32bit(self):
         return self.OPTIONAL_HEADER.Magic == MagicNumbers.IMAGE_NT_OPTIONAL_HDR32_MAGIC
 
     def is_64bit(self):
         return self.OPTIONAL_HEADER.Magic == MagicNumbers.IMAGE_NT_OPTIONAL_HDR64_MAGIC
 
-    def md5(self):
-        return hex(hodgepodge.cryptography.hashing.md5(self.__data__))
-
-    def sha1(self):
-        return hex(hodgepodge.cryptography.hashing.sha1(self.__data__))
-
-    def sha256(self):
-        return hex(hodgepodge.cryptography.hashing.sha256(self.__data__))
-
     def get_sections(self):
-        return map(lambda section: Section(section, self), self.sections)
+        for section in self.sections:
+            yield Section(section, self)
 
 
 class Section:
     def __init__(self, section, pe):
         self.obj = section
         self.name = str(section.Name)
-        self.virtual_address = hex(section.VirtualAddress)
+        self.virtual_address = format(section.VirtualAddress, 'x')
         self.size = long(section.SizeOfRawData)
 
-    def md5(self):
-        return hex(hodgepodge.cryptography.hashing.md5(self.obj.get_data()))
-
-    def sha1(self):
-        return hex(hodgepodge.cryptography.hashing.sha1(self.obj.get_data()))
-
-    def sha256(self):
-        return hex(hodgepodge.cryptography.hashing.sha256(self.obj.get_data()))
+        self.md5, self.sha1, self.sha256 = pyrekall.helpers.crypto.compute_checksum(
+            self.get_data(), hashes.MD5(), hashes.SHA1(), hashes.SHA256()
+        )
 
     def get_data(self):
         return self.obj.get_data()
 
     def __repr__(self):
-        return "{}: (SHA-1: {})".format(self.name, self.sha1())
+        return "{} @ {}".format(self.name, self.virtual_address)
 
     def __str__(self):
         return self.obj.__str__()
