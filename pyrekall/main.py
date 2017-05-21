@@ -115,7 +115,7 @@ if __name__ == "__main__":
             result['kernel_timers'] = [x.summary() for x in sample.get_kernel_timers()]
         
         if args.registry_keys:
-            result['registry_keys'] = sample.get_registry_keys()
+            result['registry_keys'] = sample.get_registry_keys().summary()
 
     if args.quiet:
         sys.exit(0)

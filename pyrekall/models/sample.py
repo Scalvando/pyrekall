@@ -13,6 +13,7 @@ from pyrekall.models.token import Token
 from pyrekall.models.unlinked_dll import UnlinkedDLL
 from pyrekall.models.kernel_module import KernelModule
 from pyrekall.models.timer import Timer
+from pyrekall.models.registry_dump import RegistryDump
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -202,7 +203,7 @@ class Sample(AbstractWrapper):
         This function is used for the purpose of getting all of the registry keys in all hives
         :return: a list of registry keys
         """
-        return [RegistryKey(r, k) for r, k in self.session.plugins.printkey(recursive=True).list_keys()]
+        return RegistryDump(self.session)
 
     def summary(self, all=False):
         summary = {

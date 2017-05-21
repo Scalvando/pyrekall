@@ -1,5 +1,5 @@
 import pyrekall.models.common
-
+from rekall import utils
 
 class RegistryDump(pyrekall.models.common.AbstractWrapper):
     """
@@ -11,40 +11,48 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
 
         self.session = session
         self.keys = []
-    
-    def dump(self, key):
+
+    def get_keys(self):
+        for reg, key in self.session.plugins.printkey(recursive=True).list_keys():
+            self._get_key(reg, key)
+
+        return self.keys
+
+    def _get_key(self, reg, key):
         #For this level of the registry get the details for the current key
         key_entry = {}
         key_entry['last_write'] = key.LastWriteTime.as_datetime().isoformat() or None
         key_entry['name'] = str(key.Name)
+        key_entry['path'] = str(key.Path)
+        key_entry['hive'] = str(reg.Name)
         values = []
         #For all the values associated with the key, put them in a dictionary
         for value in key.values():
             value_entry = {}
-            value_entry['type'] = value.Type
+            value_entry['name'] = str(value.Name)
+            value_entry['type'] = str(value.Type)
             #Attempt to extract the data as plain text - This may need to be done as
             #base64 for compatibility reasons with JSON
-            data = value.DecodedData
-            if isinstance(data, basestring)
-            except:
+            if value.Type == 'REG_BINARY':
+                data = value.DecodedData
+                if isinstance(data, basestring):
+                    value_entry['value'] = utils.Hexdump(data)
+            else:
                 try:
-                    value_data = value.value().decode('utf-16').encode('utf-8')
+                    value_entry['value'] = str(utils.SmartUnicode(value.DecodedData).strip())
                 except:
-                    value_data = " ".join(["%02X" % (ord(c)) for c in value.raw_data()])
+                    value_entry['value'] = utils.SmartUnicode(value.DecodedData).strip()
 
-            value_entry['data'] = value_data
-
-            value_entry['name'] = value.name()
             values.append(value_entry)
 
         key_entry['values'] = values
-        keys.append(key_entry)
+        self.keys.append(key_entry)
         #Spider through the subkeys
         for subkey in key.subkeys():
-            dump(subkey)
+            self._get_key(reg, subkey)
 
 
     def summary(self):
         return {
-            
+            'registry': self.get_keys()
         }
