@@ -13,7 +13,7 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
         self.keys = []
 
     def get_keys(self):
-        for reg, key in self.session.plugins.printkey(recursive=True).list_keys():
+        for reg, key in self.session.plugins.printkey().list_keys():
             self._get_key(reg, key)
 
         return self.keys
@@ -22,10 +22,10 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
         #For this level of the registry get the details for the current key
         key_entry = {}
         key_entry['last_write'] = key.LastWriteTime.as_datetime().isoformat() or None
-        key_entry['name'] = str(key.Name)
-        key_entry['path'] = str(key.Path)
-        key_entry['hive'] = str(reg.Name.split('@').strip()[0])
-        key_entry['hive_offset'] = reg.Name.split('@').strip()[1]
+        key_entry['name'] = utils.SmartStr(key.Name)
+        key_entry['path'] = utils.SmartStr(key.Path)
+        key_entry['hive'] = str(reg.Name).split(" @ ")[0].strip()
+        key_entry['hive_offset'] = str(reg.Name).split(" @ ")[1].strip()
         values = []
         #For all the values associated with the key, put them in a dictionary
         for value in key.values():
@@ -37,15 +37,14 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
             if value.Type == 'REG_BINARY':
                 data = value.DecodedData
                 if isinstance(data, basestring):
-                    value_entry['value'] = utils.Hexdump(data)
+                    value_entry['value'] = " ".join(["{0:02X}".format(ord(x)) for x in data])
             else:
-                try:
-                    value_entry['value'] = str(utils.SmartUnicode(value.DecodedData).strip())
-                except:
-                    value_entry['value'] = utils.SmartUnicode(value.DecodedData).strip()
+                    value_entry['value'] = utils.SmartStr(value.DecodedData).replace("\x00","")
 
             values.append(value_entry)
-
+        
+        if len(values) == 0:
+            values = None
         key_entry['values'] = values
         self.keys.append(key_entry)
         #Spider through the subkeys
@@ -54,6 +53,4 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
 
 
     def summary(self):
-        return {
-            'registry': self.get_keys()
-        }
+        return self.get_keys()
