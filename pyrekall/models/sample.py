@@ -138,39 +138,4 @@ class Sample(AbstractWrapper):
         return Registry(self.session)
 
     def get_users(self):
-<<<<<<< HEAD
-        for u, v, f in self.session.plugins.users().GenerateUsers():
-            users.append(User(u, v, f))
-        return users
-    
-    def get_connections(self):
-        """
-        This function is used for the purpose of getting connections
-        :return: a list of connections
-        """
-        return [Connection(c) for c in self.session.plugins.netstat().collect()]
-
-    def summary(self, all=False):
-        summary = {
-            "filename": self.filename,
-            "profile_name": self.profile_name,
-            "physical_address_space": self.physical_address_space,
-            "size": self.size,
-            "md5": self.md5,
-            "sha1": self.sha1,
-            "sha256": self.sha256,
-        }
-
-        if self.flags['human_readable']:
-            summary['size'] = pyrekall.helpers.usability.sizeof_fmt(self.size)
-
-        if all:
-            summary['processes'] = list(map(lambda x: x.summary(), self.get_processes()))
-            summary['services'] = list(map(lambda p: p.summary(), self.get_services()))
-            summary['users'] = list(map(lambda x: x.summary(), self.get_users()))
-
-        return summary
-            yield User(u, v, f)
-=======
         return list(map(lambda e: User(*e), self.session.plugins.users().GenerateUsers()))
->>>>>>> fdd38a6fba02bfac5da6914d004f9974be706ca5
