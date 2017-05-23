@@ -15,34 +15,34 @@ class Process(pyrekall.models.common.AbstractWrapper):
     def __init__(self, process, session):
         super(Process, self).__init__()
 
-        self.session = session
-        self.obj = process
+        self._session = session
+        self._obj = process
+
+        self._parent = None
+        self._children = None
 
         self.name = str(process.ImageFileName)
         self.pid = int(process.UniqueProcessId)
         self.ppid = int(process.InheritedFromUniqueProcessId)
-
-        self.parent = None
-        self.children = None
 
         # Handles
         self.number_of_handles = int(process.ObjectTable.m("HandleCount"))
         self.number_of_active_threads = int(process.ActiveThreads)
 
         # PEB fields
-        self.peb = process.Peb
-        self.path = self.peb.ProcessParameters.ImagePathName
-        self.command_line = self.peb.ProcessParameters.CommandLine
-        self.current_directory = self.peb.ProcessParameters.CurrentDirectory.DosPath
-        self.dll_path = self.peb.ProcessParameters.DllPath
+        self._peb = process.Peb
+        self.path = process.Peb.ProcessParameters.ImagePathName
+        self.command_line = process.Peb.ProcessParameters.CommandLine
+        self.current_directory = process.Peb.ProcessParameters.CurrentDirectory.DosPath
+        self.dll_path = process.Peb.ProcessParameters.DllPath
 
         # Time fields
-        self.create_time = process.CreateTime.as_datetime().strftime("%Y-%m-%d %H:%M:%S") or None
-        self.exit_time = process.ExitTime.as_datetime().strftime("%Y-%m-%d %H:%M:%S") or None
+        self.create_time = process.CreateTime
+        self.exit_time = process.ExitTime
 
         # Address space fields
-        self.virtual_offset = format(process.obj_offset, 'x')
-        self.physical_offset = format(process.obj_vm.vtop(process.obj_offset), 'x')
+        self.virtual_offset = long(process.obj_offset)
+        self.physical_offset = long(process.obj_vm.vtop(process.obj_offset))
 
         self.address_space_initialized = bool(process.AddressSpaceInitialized)
         self.has_address_space = bool(process.HasAddressSpace)
@@ -57,11 +57,37 @@ class Process(pyrekall.models.common.AbstractWrapper):
         self._handles = None
         self._dlls = None
 
+        [setattr(self, k, self.unwrap(k, v)) for k, v in self]
+
+    @property
+    def session(self):
+        return self._session
+
+    @property
+    def obj(self):
+        return self._obj
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, v):
+        self._parent = v
+
+    @property
+    def children(self):
+        return self._children
+
+    @children.setter
+    def children(self, v):
+        self._children = v
+
     @property
     def environment_variables(self):
         if self._environment_variables is None:
             e = {}
-            for x in self.peb.ProcessParameters.Environment:
+            for x in self._peb.ProcessParameters.Environment:
                 k, v = str(x).split("=", 1)
                 e[k] = v
             else:
@@ -110,11 +136,12 @@ class Process(pyrekall.models.common.AbstractWrapper):
         try:
             fd = cStringIO.StringIO()
             self.session.plugins.pedump().WritePEFile(fd=fd, address_space=self.obj.get_process_address_space(),
-                                                      image_base=self.peb.ImageBaseAddress)
-            return pyrekall.models.executable.PE(data=fd.getvalue())
+                                                      image_base=self._peb.ImageBaseAddress)
+            return pyrekall.models.executable.PE(process=self, data=fd.getvalue())
         except pefile.PEFormatError:
-            logger.exception("Failed to extract the executable associated with the {} process (PID: {})".format(
+            logger.warning("Failed to extract the executable associated with the {} process (PID: {})".format(
                 self.name, self.pid))
 
     def __str__(self):
-        return "{} @ {}".format(self.name, self.virtual_offset)
+        return "{} @ {} (PID: {})".format(self.name, self.virtual_offset, self.pid)
+

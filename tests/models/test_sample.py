@@ -1,53 +1,145 @@
+from pyrekall.models.registry import Registry
+from pyrekall.models.processes import Process
+from pyrekall.models.services import Service
+from pyrekall.models.sample import Sample
+from pyrekall.models.executable import PE
+from pyrekall.models.user import User
+
 import unittest
-import pyrekall.models.sample
-import json
+import os
 
 
-class TestSampleModel(unittest.TestCase):
-    _multiprocess_can_split_ = True
+class MockSample(Sample):
+    def __init__(self, path):
+        super(MockSample, self).__init__(path=path)
 
-    sample = pyrekall.models.sample.Sample(path="samples/stuxnet.vmem")
+    def _compute_checksums(self):
+        self._md5 = "9fb971822dcb393f930227c8854f7679"
+        self._sha1 = "6783d95883a32762042cae731887ae3693b030c1"
+        self._sha256 = "5f19ff1333fc3901fbf3fafb50d2adb0c495cf6d33789e5a959499a92aeefe77"
 
-    def test_sample_summary_is_json_serializable(self):
-        try:
-            json.dumps(self.sample.summary())
-        except ValueError as VE:
-            self.fail(VE)
+    def get_executables(self):
+        return list(map(lambda e: e.get_executable(), self.get_processes_by_name("lsass.exe")))
 
-    def test_sample_summary_is_dict(self):
-        assert isinstance(self.sample.summary(), dict), "Expected summary object to be a dictionary"
 
-    def test_sample_summary_only_consists_of_primative_types(self):
-        acceptable_types = (str, int)
-        for k, v in self.sample.summary().items():
-            assert isinstance(v, acceptable_types)
+class SampleTestCases(unittest.TestCase):
+    def setUp(self):
+        self.filename = os.path.join(os.path.dirname(__file__), "../../samples/stuxnet.vmem")
+        self.sample = MockSample(path=self.filename)
 
-    def test_service_sids(self):
-        expected = ('S-1-5-80-3615470141-4057994987-1930054357-1444440834-2714780835', 'VMUpgradeHelper')
-        results = set(map(lambda x: x, self.sample.get_service_sids()))
-        assert expected in results, "Expected %s to be in %s" % (expected, results)
+    def test__compute_checksums(self):
+        self.assertIsNone(self.sample._md5)
+        self.assertIsNone(self.sample._sha1)
+        self.assertIsNone(self.sample._sha256)
+
+        self.sample._compute_checksums()
+
+        self.assertEqual(self.sample._md5, "9fb971822dcb393f930227c8854f7679")
+        self.assertEqual(self.sample._sha1, "6783d95883a32762042cae731887ae3693b030c1")
+        self.assertEqual(self.sample._sha256, "5f19ff1333fc3901fbf3fafb50d2adb0c495cf6d33789e5a959499a92aeefe77")
+
+    def test_filename(self):
+        self.assertTrue(os.path.exists(self.sample.filename))
+
+    def test_profile(self):
+        self.assertIsNone(self.sample._profile, None)
+        self.assertIsNotNone(self.sample.profile)
+        self.assertIsNotNone(self.sample._profile)
+
+    def test_md5(self):
+        self.assertIsNone(self.sample._md5)
+        self.sample._compute_checksums()
+        self.assertEqual(self.sample._md5, "9fb971822dcb393f930227c8854f7679")
+
+    def test_sha1(self):
+        self.assertIsNone(self.sample._sha1)
+        self.sample._compute_checksums()
+        self.assertEqual(self.sample._sha1, "6783d95883a32762042cae731887ae3693b030c1")
+
+    def test_sha256(self):
+        self.assertIsNone(self.sample._sha256)
+        self.sample._compute_checksums()
+        self.assertEqual(self.sample._sha256, "5f19ff1333fc3901fbf3fafb50d2adb0c495cf6d33789e5a959499a92aeefe77")
+
+    def test_processes(self):
+        self.assertIsNone(self.sample._processes)
+        processes = self.sample.processes
+        self.assertIsNotNone(self.sample._processes)
+        self.assertIsInstance(processes, list)
+        self.assertEqual(31, len(processes))
+        self.assertTrue(all(map(lambda p: isinstance(p, Process), processes)))
+
+    def test_get_processes(self):
+        processes = self.sample.get_processes()
+        self.assertIsInstance(processes, list)
+        self.assertEqual(31, len(processes))
+        self.assertTrue(all(map(lambda p: isinstance(p, Process), processes)))
+
+        expected = {'System', 'alg.exe', 'ipconfig.exe', 'TSVNCache.exe', 'smss.exe', 'csrss.exe', 'winlogon.exe',
+                    'Procmon.exe', 'services.exe', 'lsass.exe', 'imapi.exe', 'vmacthlp.exe', 'svchost.exe', 'lsass.exe',
+                    'svchost.exe', 'cmd.exe', 'wuauclt.exe', 'svchost.exe', 'svchost.exe', 'explorer.exe',
+                    'svchost.exe', 'VMwareUser.exe', 'spoolsv.exe', 'jqs.exe', 'vmtoolsd.exe', 'jusched.exe',
+                    'VMUpgradeHelper', 'wmiprvse.exe', 'VMwareTray.exe', 'lsass.exe', 'wscntfy.exe'}
+
+        result = set(map(lambda x: x.name, processes))
+        self.assertEqual(expected, result)
+
+    def test_get_process_by_name(self):
+        process = self.sample.get_process_by_name("lsass.exe")
+        self.assertIsInstance(process, Process)
+        self.assertEqual(process.name, "lsass.exe")
+
+    def test_get_processes_by_name(self):
+        expected = {680, 868, 1928}
+        processes = self.sample.get_processes_by_name("lsass.exe")
+        results = set(map(
+            lambda p: p.pid, processes)
+        )
+        self.assertTrue(all(map(lambda p: p.name == "lsass.exe", processes)))
+        self.assertEqual(expected, results)
+
+    def test_get_process_by_pid(self):
+        process = self.sample.get_process_by_pid(680)
+        self.assertIsInstance(process, Process)
+        self.assertEqual(process.pid, 680)
+
+    def test_get_processes_by_ppid(self):
+        expected = {668, 680}
+        processes = self.sample.get_processes_by_ppid(624)
+        results = set(map(
+            lambda p: p.pid, processes)
+        )
+        self.assertEqual(expected, results)
+
+    def test_get_executables(self):
+        executables = self.sample.get_executables()
+        self.assertIsInstance(executables, list)
+        self.assertEqual(3, len(executables))
+        self.assertTrue(all(map(lambda p: isinstance(p, PE), executables)))
+
+    def test_get_all_process_environment_variables(self):
+        environment_variables = self.sample.get_all_process_environment_variables()
+        self.assertIsInstance(environment_variables, dict)
+        self.assertEqual(54, len(environment_variables))
+
+    def test_get_service_sids(self):
+        sids = self.sample.get_service_sids()
+        self.assertIsInstance(sids, list)
+        self.assertEqual(310, len(sids))
+        self.assertTrue(all(map(lambda e: isinstance(e[0], str) and isinstance(e[1], str), sids)))
 
     def test_get_services(self):
-        expected = {
-            'name': 'WebClient',
-            'tag': None,
-            'group': u'NetworkProvider\x00',
-            'display_name': u'WebClient\x00',
-            'object_name': u'NT AUTHORITY\\LocalService\x00',
-            'image_path': u'%SystemRoot%\\system32\\svchost.exe -k LocalService\x00',
-            'additional_attributes': {},
-            'depends_on_groups': [],
-            'depends_on_services': [u'MRxDAV'],
-            'description':  u'Enables Windows-based programs to create, access, and modify Internet-based files. If '
-                            u'this service is stopped, these functions will not be available. If this service is '
-                            u'disabled, any services that explicitly depend on it will fail to start.\x00',
-            'error_control': 'SERVICE_ERROR_NORMAL',
-            'start': 'SERVICE_AUTO_START',
-            'type': 'SERVICE_WIN32_SHARE_PROCESS'
-        }
-        services = {}
-        for service in self.sample.get_services():
-            services[service.name] = service.summary()
+        services = self.sample.get_services()
+        self.assertIsInstance(services, list)
+        self.assertEqual(310, len(services))
+        self.assertTrue(all(map(lambda e: isinstance(e, Service), services)))
 
-        assert expected['name'] in services.keys(), "Expected %s, got %s" % (expected['name'], services.keys())
-        assert expected == services[expected['name']], "Expected %s to be in list of service summaries" % expected
+    def test_get_users(self):
+        users = self.sample.get_users()
+        self.assertIsInstance(users, list)
+        self.assertEqual(5, len(users))
+        self.assertTrue(all(map(lambda u: isinstance(u, User), users)))
+
+    def test_get_registry(self):
+        registry = self.sample.get_registry()
+        self.assertIsInstance(registry, Registry)
