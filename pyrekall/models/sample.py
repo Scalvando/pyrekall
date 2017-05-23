@@ -7,13 +7,10 @@ from pyrekall.models.registry import Registry
 from pyrekall.models.connections import Connection
 from pyrekall.models.user import User
 
-from hodgepodge.common.iterables import chunks
-
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
 import pyrekall.helpers.crypto
 import rekall.session
-import collections
 import os
 
 
@@ -31,6 +28,7 @@ class Sample(AbstractWrapper):
         self._sha256 = None
 
         self._processes = None
+        self._executables = None
 
     @property
     def session(self):
@@ -75,38 +73,48 @@ class Sample(AbstractWrapper):
                 lambda p: Process(process=p, session=self.session), self.session.plugins.pslist().filter_processes()))
 
             for p1 in processes:
-                p1.children = []
+                children = []
                 for p2 in processes:
                     if p1.pid == p2.ppid:
-                        p1.children.append(p2)
+                        children.append(p2)
 
                     if p1.ppid == p2.pid:
                         p1.parent = p2
+                else:
+                    p1.children = children
+
             self._processes = sorted(processes, key=lambda p: p.pid)
         return self._processes
 
     def get_processes(self):
         return self.processes
 
+    def get_process_by_name(self, name):
+        return next(iter(self.get_processes_by_name(name)), None)
+
     def get_processes_by_name(self, name=None):
         if name is None:
-            for process in self.get_processes():
-                yield process
+            return self.processes
         else:
-            for process in filter(lambda p: p.name == name, self.processes):
-                yield process
-
-    def get_process_by_name(self, name):
-        return next(self.get_processes_by_name(name), None)
+            return list(filter(lambda p: p.name == name, self.processes))
 
     def get_process_by_pid(self, pid):
         for process in self.get_processes():
             if process.pid == pid:
                 return process
 
+    def get_processes_by_ppid(self, ppid):
+        return list(filter(lambda p: p.ppid == ppid, self.get_processes()))
+
+    def get_executables(self):
+        return list(filter(
+            lambda e: e is not None, map(
+                lambda p: p.get_executable(), self.processes)
+            )
+        )
+
     def get_all_process_environment_variables(self):
         e = {}
-
         for p in self.processes:
             for k, v in p.get_environment_variables().items():
                 values = e.get(k, set())
@@ -118,17 +126,19 @@ class Sample(AbstractWrapper):
         return e
 
     def get_service_sids(self):
+        sids = []
         for k, v in self.session.plugins.getservicesids().get_service_sids():
-            yield k, str(v)
+            sids.append((str(k), str(v)))
+        return sids
 
     def get_services(self):
-        for service in self.session.plugins.services().GenerateServices():
-            yield Service(service)
+        return list(map(lambda e: Service(e), self.session.plugins.services().GenerateServices()))
 
     def get_registry(self):
         return Registry(self.session)
 
     def get_users(self):
+<<<<<<< HEAD
         for u, v, f in self.session.plugins.users().GenerateUsers():
             users.append(User(u, v, f))
         return users
@@ -161,3 +171,6 @@ class Sample(AbstractWrapper):
 
         return summary
             yield User(u, v, f)
+=======
+        return list(map(lambda e: User(*e), self.session.plugins.users().GenerateUsers()))
+>>>>>>> fdd38a6fba02bfac5da6914d004f9974be706ca5
