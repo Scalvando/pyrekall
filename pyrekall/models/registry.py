@@ -34,6 +34,4 @@ class Registry(pyrekall.models.common.AbstractWrapper):
         return names
 
     def summary(self):
-        return {
-            'hives': self.get_hive_names()
-        }
+        return self.get_hive_names()

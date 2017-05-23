@@ -24,7 +24,8 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
         key_entry['last_write'] = key.LastWriteTime.as_datetime().isoformat() or None
         key_entry['name'] = str(key.Name)
         key_entry['path'] = str(key.Path)
-        key_entry['hive'] = str(reg.Name)
+        key_entry['hive'] = str(reg.Name.split('@').strip()[0])
+        key_entry['hive_offset'] = reg.Name.split('@').strip()[1]
         values = []
         #For all the values associated with the key, put them in a dictionary
         for value in key.values():
