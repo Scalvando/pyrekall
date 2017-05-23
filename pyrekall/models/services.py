@@ -1,5 +1,4 @@
 from rekall.plugins.windows.registry.printkey import Services
-from pprint import pprint
 
 import pyrekall.helpers.usability
 import pyrekall.models.common
@@ -57,23 +56,5 @@ class Service(pyrekall.models.common.AbstractWrapper):
                 v = Services.START_TYPE.get(v, v)
             elif k == "error_control":
                 v = Services.ERROR_CONTROL.get(v, v)
-
             metadata[k] = v
         return metadata
-
-    def summary(self):
-        return {
-            'name': self.name,
-            'tag': self.tag,
-            'group': self.group,
-            'display_name': self.display_name,
-            'object_name': self.object_name,
-            'description': self.description,
-            'image_path': self.image_path,
-            'type': self.type,
-            'start': self.start,
-            'error_control': self.error_control,
-            'additional_attributes': self.additional_attributes,
-            'depends_on_services': self.depends_on_services,
-            'depends_on_groups': self.depends_on_groups,
-        }
