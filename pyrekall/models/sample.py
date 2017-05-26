@@ -5,6 +5,8 @@ from pyrekall.models.registry import Registry
 from pyrekall.models.user import User
 from pyrekall.models.dnscache import DnsCache
 from pyrekall.models.symlink import SymLink
+from pyrekall.models.importfunc import ImportFunc
+from pyrekall.models.hiddenproc import HiddenProc
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -123,14 +125,60 @@ class Sample(AbstractWrapper):
         This function is used to identify DNS cache records
         :return: a list of DNS cache records
         """
-        return [DnsCache(record) for record in self.session.plugins.dns_cache().collect()]
+        dnsCacheRecords = []
+        parentAddress = 0
+
+        for record in self.session.plugins.dns_cache().collect():            
+            if record['depth'] == 0:
+                parentAddress = record['record']
+                dnsCacheRecords.append(DnsCache(record, None))
+            else:
+                dnsCacheRecords.append(DnsCache(record, parentAddress))
+
+        return dnsCacheRecords
 
     def get_symlinks(self):
         """
-        This function is used to identify DNS cache records
-        :return: a list of DNS cache records
+        This function is used to identify symbolic link objects
+        :return: a list of Symbolic Link Objects
         """
         return [SymLink(record) for record in self.session.plugins.symlinkscan().collect()]
+
+    def get_importfunc(self):
+        """
+        This function is used to identify imported functions
+        :return: a list of imported functions
+        """
+        impscan = self.session.plugins.impscan()
+
+        impfuncs = []
+
+        if impscan.kernel:
+            for iat, func, mod, func_name in impscan.find_kernel_import():
+                mod_name, func_name = impscan._original_import(mod.BaseDllName, func_name)
+                impfuncs.append(ImportFunc(iat, func, mod_name, func_name))
+        else:
+            for task in impscan.filter_processes():
+                if list(task.get_load_modules()):
+                    for iat, func, mod, func_name in impscan.find_process_imports(task):
+                        mod_name, func_name = impscan._original_import(mod.BaseDllName, func_name)
+                        impfuncs.append(ImportFunc(iat, func, mod_name, func_name))
+
+        return impfuncs
+
+    def get_hiddenproc(self):
+        """
+        This function is used to identify hidden processes
+        :return: a list of hidden processes
+        """
+        psxview = self.session.plugins.psxview()
+
+        hiddenproc = []
+
+        for eprocess in psxview.filter_processes():
+            hiddenproc.append(HiddenProc(eprocess, self.session))
+
+        return hiddenproc
 
     def summary(self, all=False):
         summary = {

@@ -17,8 +17,10 @@ parser.add_argument('-A', '--all', dest='all', action='store_true', help='list e
 parser.add_argument('-X', '--sample', dest='sample', action='store_true', help="list high-level information about the memory sample")
 parser.add_argument('-S', '--services', dest='services', action='store_true', help="list running services")
 parser.add_argument('-U', '--users', dest='users', action='store_true', help="list users")
-parser.add_argument('-D', '--dnscache', dest='dns_cache', action='store_true', help='list DNS records')
+parser.add_argument('-Dc', '--dnscache', dest='dns_cache', action='store_true', help='list DNS records')
 parser.add_argument('-Sl', '--symlinks', dest='symlinks', action='store_true', help='list symlink objects')
+parser.add_argument('-I', '--importfunc', dest='importfunc', action='store_true', help='list imported functions')
+parser.add_argument('-Hp', '--hiddenproc', dest='hiddenproc', action='store_true', help='list hidden processes')
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
 parser.add_argument('--include-handles', dest='include_handles', action='store_true', help='include handles in process summaries')
@@ -40,7 +42,9 @@ if __name__ == "__main__":
         args.processes,
         args.users,
         args.dns_cache,
-        args.symlinks
+        args.symlinks,
+        args.importfunc,
+        args.hiddenproc
     ]):
         parser.print_help()
         sys.exit(1)
@@ -71,6 +75,12 @@ if __name__ == "__main__":
         
         if args.symlinks:
             result['symlinks'] = list(map(lambda x: x.summary(), sample.get_symlinks()))
+
+        if args.importfunc:
+            result['importfunc'] = list(map(lambda x: x.summary(), sample.get_importfunc()))
+
+        if args.hiddenproc:
+            result['hiddenproc'] = list(map(lambda x: x.summary(), sample.get_hiddenproc()))
 
     if args.quiet:
         sys.exit(0)

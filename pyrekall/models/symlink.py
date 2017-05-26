@@ -1,5 +1,4 @@
 import pyrekall.models.common
-import pyrekall.helpers.usability
 
 
 class SymLink(pyrekall.models.common.AbstractWrapper):
@@ -13,7 +12,7 @@ class SymLink(pyrekall.models.common.AbstractWrapper):
         self.from_link = str(symlink['from_link'])
         self.to_link = str(symlink['to_link'])
         self.ptr_no = str(symlink['ptr_no'])
-        self.creation_time = str(symlink['creation_time'])
+        self.creation_time = symlink['creation_time'].as_datetime().isoformat()
         self.hnd_no = str(symlink['hnd_no'])
         self.offset = str(symlink['offset'])
 
