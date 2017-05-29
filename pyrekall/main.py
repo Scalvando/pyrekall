@@ -28,6 +28,7 @@ parser.add_argument('--unlinked-dlls', dest='unlinked_dlls', action='store_true'
 parser.add_argument('--kernel-modules', dest='kernel_modules', action='store_true', help="list loaded kernel modules")
 parser.add_argument('--kernel-timers', dest='kernel_timers', action='store_true', help="list loaded kernel timers")
 parser.add_argument('-R', '--registry', dest='registry_keys', action='store_true', help="list registry keys")
+parser.add_argument('--shimcache', dest='shimcache', action='store_true', help="list shimcache entries")
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
 parser.add_argument('--include-handles', dest='include_handles', action='store_true', help='include handles in process summaries')
@@ -58,7 +59,8 @@ if __name__ == "__main__":
         args.unlinked_dlls,
         args.kernel_modules,
         args.kernel_timers,
-        args.registry_keys
+        args.registry_keys,
+        args.shimcache
     ]):
         parser.print_help()
         sys.exit(1)
@@ -116,6 +118,9 @@ if __name__ == "__main__":
         
         if args.registry_keys:
             result['registry_keys'] = sample.get_registry_keys().summary()
+        
+        if args.shimcache:
+            result['shimcache'] = [x.summary() for x in sample.get_shimcache()]
 
     if args.quiet:
         sys.exit(0)

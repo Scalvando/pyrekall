@@ -14,6 +14,7 @@ from pyrekall.models.unlinked_dll import UnlinkedDLL
 from pyrekall.models.kernel_module import KernelModule
 from pyrekall.models.timer import Timer
 from pyrekall.models.registry_dump import RegistryDump
+from pyrekall.models.shimcache import ShimCache
 
 import pyrekall.helpers.usability
 import pyrekall.helpers.files
@@ -204,6 +205,13 @@ class Sample(AbstractWrapper):
         :return: a list of registry keys
         """
         return RegistryDump(self.session)
+    
+    def get_shimcache(self):
+        """
+        This function is used for the purpose of getting all of the registry keys in all hives
+        :return: a list of registry keys
+        """
+        return [ShimCache(s) for s in self.session.plugins.shimcachemem().collect()]
 
     def summary(self, all=False):
         summary = {
