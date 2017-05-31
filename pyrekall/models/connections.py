@@ -1,5 +1,6 @@
 import pyrekall.models.common
 
+from rekall import utils
 
 class Connection(pyrekall.models.common.AbstractWrapper):
     """
@@ -10,12 +11,12 @@ class Connection(pyrekall.models.common.AbstractWrapper):
         super(Connection, self).__init__()
 
         self.offset = hex(connection[0])
-        self.protocol = connection[1]
-        self.local_addr = connection[2]
-        self.remote_addr = connection[3]
-        self.state = str(connection[4])
-        self.pid = int(connection[5])
-        self.owner = str(connection[6]) or connection[6]
+        self.protocol = utils.SmartStr(connection[1])
+        self.local_addr = utils.SmartStr(connection[2])
+        self.remote_addr = utils.SmartStr(connection[3])
+        self.state = utils.SmartStr(connection[4])
+        self.pid = utils.SmartStr(connection[5])
+        self.owner = utils.SmartStr(connection[6])
         self.created = connection[7].as_datetime().isoformat() or None
 
     def summary(self):

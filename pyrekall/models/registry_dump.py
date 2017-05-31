@@ -30,19 +30,24 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
         #For all the values associated with the key, put them in a dictionary
         for value in key.values():
             value_entry = {}
-            value_entry['name'] = str(value.Name)
-            value_entry['type'] = str(value.Type)
+            value_entry['name'] = utils.SmartStr(value.Name)
+            value_entry['type'] = utils.SmartStr(value.Type)
             #Attempt to extract the data as plain text - This may need to be done as
             #base64 for compatibility reasons with JSON
             if value.Type == 'REG_BINARY':
                 data = value.DecodedData
                 if isinstance(data, basestring):
                     value_entry['value'] = " ".join(["{0:02X}".format(ord(x)) for x in data])
+            elif value.Type == 'REG_MULTI_SZ':
+                value_entry['value'] = [utils.SmartStr(v) for v in value.DecodedData if v != '']
             else:
-                    value_entry['value'] = utils.SmartStr(value.DecodedData).replace("\x00","")
+                try:
+                    value_entry['value'] = unicode(utils.SmartStr(value.DecodedData).replace("\x00", ""), "utf-8")
+                except:
+                    value_entry['value'] = " ".join(["{0:02X}".format(ord(x)) for x in value.DecodedData])
 
             values.append(value_entry)
-        
+
         if len(values) == 0:
             values = None
         key_entry['values'] = values
