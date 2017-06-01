@@ -29,6 +29,10 @@ parser.add_argument('--kernel-modules', dest='kernel_modules', action='store_tru
 parser.add_argument('--kernel-timers', dest='kernel_timers', action='store_true', help="list loaded kernel timers")
 parser.add_argument('-R', '--registry', dest='registry_keys', action='store_true', help="list registry keys")
 parser.add_argument('--shimcache', dest='shimcache', action='store_true', help="list shimcache entries")
+parser.add_argument('-Dc', '--dnscache', dest='dns_cache', action='store_true', help='list DNS records')
+parser.add_argument('-Sl', '--symlinks', dest='symlinks', action='store_true', help='list symlink objects')
+parser.add_argument('-I', '--importfunc', dest='importfunc', action='store_true', help='list imported functions')
+parser.add_argument('-Hp', '--hiddenproc', dest='hiddenproc', action='store_true', help='list hidden processes')
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
 parser.add_argument('--include-handles', dest='include_handles', action='store_true', help='include handles in process summaries')
@@ -60,7 +64,11 @@ if __name__ == "__main__":
         args.kernel_modules,
         args.kernel_timers,
         args.registry_keys,
-        args.shimcache
+        args.shimcache,
+        args.dns_cache,
+        args.symlinks,
+        args.importfunc,
+        args.hiddenproc
     ]):
         parser.print_help()
         sys.exit(1)
@@ -121,6 +129,19 @@ if __name__ == "__main__":
         
         if args.shimcache:
             result['shimcache'] = [x.summary() for x in sample.get_shimcache()]
+
+        if args.dns_cache:
+            result['dns_cache'] = list(map(lambda x: x.summary(), sample.get_dns_cache()))
+        
+        if args.symlinks:
+            result['symlinks'] = list(map(lambda x: x.summary(), sample.get_symlinks()))
+
+        if args.importfunc:
+            result['importfunc'] = list(map(lambda x: x.summary(), sample.get_importfunc()))
+
+        if args.hiddenproc:
+            result['hiddenproc'] = list(map(lambda x: x.summary(), sample.get_hiddenproc()))
+
 
     if args.quiet:
         sys.exit(0)
