@@ -84,7 +84,7 @@ class Process(pyrekall.models.common.AbstractWrapper):
         handles = []
         for object_header, handle_type, details in self.session.plugins.handles().enumerate_handles(self.raw):
             handles.append(pyrekall.models.handles.Handle(process=self.raw, handle=object_header, details=details,
-                                                          type=handle_type))
+                                                          handle_type=handle_type))
         return handles
 
     def get_dlls(self):

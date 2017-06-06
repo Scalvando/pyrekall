@@ -7,6 +7,7 @@ import argparse
 import logging
 import pprint
 import sys
+import json
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -21,18 +22,18 @@ parser.add_argument('-C', '--connections', dest='connections', action='store_tru
 parser.add_argument('-M', '--mft', dest='mft', action='store_true', help="list MFT entries")
 parser.add_argument('-F', '--files', dest='files', action='store_true', help="list files")
 parser.add_argument('-D', '--drivers', dest='drivers', action='store_true', help="list drivers")
-parser.add_argument('--service-descriptors', dest='ssdt', action='store_true', help="list service descriptor table contents")
+parser.add_argument('--ssdt', dest='ssdt', action='store_true', help="list service descriptor table contents")
 parser.add_argument('-T', '--threads', dest='threads', action='store_true', help="list threads")
 parser.add_argument('--tokens', dest='tokens', action='store_true', help="list tokens")
-parser.add_argument('--unlinked-dlls', dest='unlinked_dlls', action='store_true', help="list unlinked DLLs")
-parser.add_argument('--kernel-modules', dest='kernel_modules', action='store_true', help="list loaded kernel modules")
-parser.add_argument('--kernel-timers', dest='kernel_timers', action='store_true', help="list loaded kernel timers")
+parser.add_argument('--unlinked', dest='unlinked_dlls', action='store_true', help="list unlinked DLLs")
+parser.add_argument('--kmodules', dest='kernel_modules', action='store_true', help="list loaded kernel modules")
+parser.add_argument('--ktimers', dest='kernel_timers', action='store_true', help="list loaded kernel timers")
 parser.add_argument('-R', '--registry', dest='registry_keys', action='store_true', help="list registry keys")
 parser.add_argument('--shimcache', dest='shimcache', action='store_true', help="list shimcache entries")
-parser.add_argument('-Dc', '--dnscache', dest='dns_cache', action='store_true', help='list DNS records')
-parser.add_argument('-Sl', '--symlinks', dest='symlinks', action='store_true', help='list symlink objects')
-parser.add_argument('-I', '--importfunc', dest='importfunc', action='store_true', help='list imported functions')
-parser.add_argument('-Hp', '--hiddenproc', dest='hiddenproc', action='store_true', help='list hidden processes')
+parser.add_argument('--dnscache', dest='dns_cache', action='store_true', help='list DNS records')
+parser.add_argument('--symlinks', dest='symlinks', action='store_true', help='list symlink objects')
+parser.add_argument('-I', '--imports', dest='importfunc', action='store_true', help='list imported functions')
+parser.add_argument('-H', '--hidden', dest='hiddenproc', action='store_true', help='list hidden processes')
 
 parser.add_argument('-P', '--processes', dest='processes', action='store_true', help='list running processes')
 parser.add_argument('--include-handles', dest='include_handles', action='store_true', help='include handles in process summaries')
@@ -42,6 +43,8 @@ parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', help="do
 parser.add_argument('--pretty-print', dest='pretty_print', action='store_true', help='pretty print the CLI output')
 parser.add_argument('--human-readable', dest='human_readable', action='store_true',
                     help='use human readable representations of integers where applicable (e.g. 128868 → 126MiB )')
+parser.add_argument('-j', '--json', dest='json', action='store_true', help='output as JSON')
+parser.add_argument('-o', '--output', type=argparse.FileType('w+'), dest='output', help='output file path')
 
 args = parser.parse_args()
 
@@ -147,5 +150,10 @@ if __name__ == "__main__":
         sys.exit(0)
     elif args.pretty_print:
         pprint.pprint(result)
+    elif args.json:
+        with open(args.output.name, 'w+') as f:
+            for artifact in result:
+                for item in result[artifact]:
+                    f.write('{}\n'.format(json.dumps(item)))
     else:
         print(result)

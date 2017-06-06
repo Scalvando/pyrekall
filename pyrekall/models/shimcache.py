@@ -17,7 +17,7 @@ class ShimCache(pyrekall.models.common.AbstractWrapper):
             self.size = pyrekall.helpers.usability.sizeof_fmt(shimcache['size'])
         else:
             self.size = None
-        self.path = utils.SmartStr(shimcache['Path'])
+        self.path = utils.SmartStr(shimcache['Path']).replace("\\??\\","")
 
     def summary(self):
         return {

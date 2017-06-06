@@ -37,8 +37,8 @@ class Sample(AbstractWrapper):
         self.session = rekall.session.InteractiveSession(filename=path)
         self.profile = self.session.profile
 
-        self.filename = self.session.physical_address_space.fname
-        self.size = self.session.physical_address_space.fsize
+        #self.filename = self.session.physical_address_space.fname
+        #self.size = self.session.physical_address_space.fsize
         self.profile_name = self.profile.name
 
         self.physical_address_space = str(self.session.physical_address_space)

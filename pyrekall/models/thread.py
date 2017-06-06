@@ -1,5 +1,7 @@
 import pyrekall.models.common
 
+from rekall import utils 
+
 class Thread(pyrekall.models.common.AbstractWrapper):
     """
     This class is used to represent threads.
@@ -14,8 +16,8 @@ class Thread(pyrekall.models.common.AbstractWrapper):
         self.start_address = hex(thread[3])
         self.create_time = thread[4].as_datetime().isoformat() or None
         self.exit_time = thread[5].as_datetime().isoformat() or None
-        self.process = str(thread[6])
-        self.symbol = str(thread[7])
+        self.process = utils.SmartStr(thread[6])
+        #self.symbol = utils.SmartUnicode(thread[7])
 
     def summary(self):
         return {
@@ -25,6 +27,6 @@ class Thread(pyrekall.models.common.AbstractWrapper):
             'start_address': self.start_address,
             'created': self.create_time,
             'exited': self.exit_time,
-            'process': self.process,
-            'symbol': self.symbol
+            'process': self.process
+            #'symbol': self.symbol
         }

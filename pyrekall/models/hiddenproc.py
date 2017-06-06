@@ -18,9 +18,9 @@ class HiddenProc(Process):
 
     def summary(self):
         summary = super(HiddenProc, self).summary()
-        summary['psActiveProcessHead'] = self.psActiveProcessHead
+        summary['ps_active_process_head'] = self.psActiveProcessHead
         summary['csrss'] = self.csrss
-        summary['pspCidTable'] = self.pspCidTable
+        summary['psp_cid_table'] = self.pspCidTable
         summary['sessions'] = self.sessions
         summary['handles'] = self.handles
         summary['psscan'] = self.psscan

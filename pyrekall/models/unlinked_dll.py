@@ -1,5 +1,7 @@
 import pyrekall.models.common
 
+from rekall import utils
+
 class UnlinkedDLL(pyrekall.models.common.AbstractWrapper):
     """
     This class is used to represent unlinked DLLs.
@@ -8,24 +10,24 @@ class UnlinkedDLL(pyrekall.models.common.AbstractWrapper):
     def __init__(self, unlinked_dll):
         super(UnlinkedDLL, self).__init__()
 
-        process = unlinked_dll[1]
+        process = unlinked_dll['_EPROCESS']
         self.pid = int(process.UniqueProcessId)
-        self.process_name = str(process.ImageFileName)
-        self.base_address = hex(unlinked_dll[2])
-        self.in_load = unlinked_dll[3]
-        self.in_load_path = str(unlinked_dll[4])
-        self.in_init = unlinked_dll[5]
-        self.in_init_path = str(unlinked_dll[6])
-        self.in_mem = unlinked_dll[7]
-        self.in_mem_path = str(unlinked_dll[8])
-        self.mapped_path = str(unlinked_dll[9])
+        self.process = utils.SmartStr(process.ImageFileName)
+        self.base = hex(unlinked_dll['base'])
+        self.in_load = unlinked_dll['in_load']
+        self.in_load_path = utils.SmartStr(unlinked_dll['in_load_path'])
+        self.in_init = unlinked_dll['in_init']
+        self.in_init_path = utils.SmartStr(unlinked_dll['in_init_path'])
+        self.in_mem = unlinked_dll['in_mem']
+        self.in_mem_path = utils.SmartStr(unlinked_dll['in_mem_path'])
+        self.mapped_path = utils.SmartStr(unlinked_dll['mapped'])
 
 
     def summary(self):
         return {
             'pid': self.pid,
-            'process': self.process_name,
-            'base_address': self.base_address,
+            'process': self.process,
+            'base_address': self.base,
             'in_load': self.in_load,
             'in_load_path': self.in_load_path,
             'in_init': self.in_init,
