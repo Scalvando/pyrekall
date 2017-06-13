@@ -11,20 +11,19 @@ class SymLink(pyrekall.models.common.AbstractWrapper):
         self.a = str(symlink['a'])
         self.from_link = str(symlink['from_link'])
         self.to_link = str(symlink['to_link'])
-        self.ptr_no = str(symlink['ptr_no'])
-        self.creation_time = symlink['creation_time'].as_datetime().isoformat()
-        self.hnd_no = str(symlink['hnd_no'])
-        self.offset = str(symlink['offset'])
+        self.ptr_no = int(symlink['ptr_no'])
+        self.creation_time = symlink['creation_time'].as_datetime().isoformat() or None
+        self.hnd_no = int(symlink['hnd_no'])
+        self.offset = format(symlink['offset'], 'X')
 
     def summary(self):
         summary = {
-            'a': self.a,
-            'from_link': self.from_link,
-            'to_link': self.to_link,
-            'ptr_no': self.ptr_no,
+            'allocated': self.a,
+            'physical_offset': self.offset,
+            'number_of_pointers': self.ptr_no,
+            'number_of_handles': self.hnd_no,
             'creation_time': self.creation_time,
-            'hnd_no': self.hnd_no,
-            'offset': self.offset,
-
+            'from': self.from_link,
+            'to': self.to_link
         }
         return summary

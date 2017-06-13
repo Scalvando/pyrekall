@@ -15,7 +15,7 @@ class Timer(pyrekall.models.common.AbstractWrapper):
         self.due_time = timer['due_time'].as_datetime().isoformat() or None
         self.period = int(timer['period'])
         self.signaled = timer['sig']
-        self.routine = hex(timer['routine'])
+        self.routine = format(timer['routine'], 'X')
         self.symbol = utils.SmartStr(timer['symbol'])
 
     def summary(self):

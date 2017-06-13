@@ -23,6 +23,6 @@ class MFTEntry(pyrekall.models.common.AbstractWrapper):
             'file_modified': self.file_modified,
             'mft_modified': self.mft_modified,
             'access': self.access,
-            'create_time': self.create_time,
+            'creation_time': self.create_time,
             'name': self.name
         }

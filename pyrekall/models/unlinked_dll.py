@@ -13,7 +13,7 @@ class UnlinkedDLL(pyrekall.models.common.AbstractWrapper):
         process = unlinked_dll['_EPROCESS']
         self.pid = int(process.UniqueProcessId)
         self.process = utils.SmartStr(process.ImageFileName)
-        self.base = hex(unlinked_dll['base'])
+        self.base = format(unlinked_dll['base'], 'X')
         self.in_load = unlinked_dll['in_load']
         self.in_load_path = utils.SmartStr(unlinked_dll['in_load_path'])
         self.in_init = unlinked_dll['in_init']
@@ -26,7 +26,7 @@ class UnlinkedDLL(pyrekall.models.common.AbstractWrapper):
     def summary(self):
         return {
             'pid': self.pid,
-            'process': self.process,
+            'process_name': self.process,
             'base_address': self.base,
             'in_load': self.in_load,
             'in_load_path': self.in_load_path,

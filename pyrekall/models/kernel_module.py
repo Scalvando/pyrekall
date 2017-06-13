@@ -12,10 +12,10 @@ class KernelModule(pyrekall.models.common.AbstractWrapper):
         super(KernelModule, self).__init__()
         
         module = kernel_module['_LDR_DATA_TABLE_ENTRY']
-        self.entry_point = hex(module.EntryPoint)
+        self.entry_point = format(module.EntryPoint, 'X')
         self.load_count = int(module.LoadCount)
         self.name = utils.SmartStr(kernel_module['name'])
-        self.base = hex(kernel_module['base'])
+        self.base = format(kernel_module['base'], 'X')
         self.size = pyrekall.helpers.usability.sizeof_fmt(kernel_module['size'])
         self.path = utils.SmartStr(kernel_module['path'])
 
@@ -24,7 +24,7 @@ class KernelModule(pyrekall.models.common.AbstractWrapper):
             'entry_point': self.entry_point,
             'load_count': self.load_count,
             'name': self.name,
-            'base': self.base,
+            'base_address': self.base,
             'size': self.size,
             'path': self.path
         }

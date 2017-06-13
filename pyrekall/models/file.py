@@ -10,7 +10,7 @@ class File(pyrekall.models.common.AbstractWrapper):
         super(File, self).__init__()
 
         self.allocated = file['a']
-        self.physical_offset = hex(file['offset'])
+        self.physical_offset = format(file['offset'], 'X')
         self.ptr_count = int(file['ptr_no'])
         self.hnd_count = int(file['hnd_no'])
         self.access = file['access']
@@ -21,8 +21,8 @@ class File(pyrekall.models.common.AbstractWrapper):
         return {
             'allocated': self.allocated,
             'physical_offset': self.physical_offset,
-            'ptr_count': self.ptr_count,
-            'hnd_count': self.hnd_count,
+            'number_of_pointers': self.ptr_count,
+            'number_of_handles': self.hnd_count,
             'access': self.access,
             'pid': self.pid,
             'path': self.path

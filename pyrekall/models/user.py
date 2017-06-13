@@ -18,10 +18,10 @@ class User(pyrekall.models.common.AbstractWrapper):
         self.nt_hash = v.NTHash
         self.lan_hash = v.LanHash
 
-        self.account_expiration = f.AccountExpiration
-        self.password_failed_time = f.PasswordFailedTime
-        self.password_reset_date = f.PwdResetDate
-        self.last_login_time = f.LastLoginTime
+        self.account_expiration = f.AccountExpiration.as_datetime().isoformat() or None
+        self.password_failed_time = f.PasswordFailedTime.as_datetime().isoformat() or None
+        self.password_reset_date = f.PwdResetDate.as_datetime().isoformat() or None
+        self.last_login_time = f.LastLoginTime.as_datetime().isoformat() or None
 
         self.login_count = int(f.LoginCount)
         self.failed_login_count = int(f.FailedLoginCount)

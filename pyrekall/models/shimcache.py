@@ -13,10 +13,7 @@ class ShimCache(pyrekall.models.common.AbstractWrapper):
         print 
         self.last_modified = shimcache['last_mod'].as_datetime().isoformat() or None
         self.last_update = shimcache['last_update'].as_datetime().isoformat() or None
-        if shimcache['size']:
-            self.size = pyrekall.helpers.usability.sizeof_fmt(shimcache['size'])
-        else:
-            self.size = None
+        self.size = pyrekall.helpers.usability.sizeof_fmt(shimcache['size'] if shimcache['size'] else 0) 
         self.path = utils.SmartStr(shimcache['Path']).replace("\\??\\","")
 
     def summary(self):

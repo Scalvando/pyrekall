@@ -40,20 +40,20 @@ class Process(pyrekall.models.common.AbstractWrapper):
         self.handles = self.get_handles()
 
         # Time fields
-        self.create_time = process.CreateTime.as_datetime().strftime("%Y-%m-%d %H:%M:%S") or None
-        self.exit_time = process.ExitTime.as_datetime().strftime("%Y-%m-%d %H:%M:%S") or None
+        self.create_time = process.CreateTime.as_datetime().isoformat() or None
+        self.exit_time = process.ExitTime.as_datetime().isoformat() or None
 
         # Address space fields
-        self.virtual_offset = hex(process.obj_offset)
-        self.physical_offset = hex(process.obj_vm.vtop(process.obj_offset))
+        self.virtual_offset = format(process.obj_offset, 'X')
+        self.physical_offset = format(process.obj_vm.vtop(process.obj_offset), 'X')
         self.address_space_initialized = bool(process.AddressSpaceInitialized)
         self.has_address_space = bool(process.HasAddressSpace)
 
         # The executable and any associated cryptographic checksums
         self.raw_pe = self._write_pe_to_stringio()
-        self.sha256 = hex(pyrekall.helpers.crypto.sha256(self.raw_pe))
-        self.sha1 = hex(pyrekall.helpers.crypto.sha1(self.raw_pe))
-        self.md5 = hex(pyrekall.helpers.crypto.md5(self.raw_pe))
+        self.sha256 = format(pyrekall.helpers.crypto.sha256(self.raw_pe),'X')
+        self.sha1 = format(pyrekall.helpers.crypto.sha1(self.raw_pe), 'X')
+        self.md5 = format(pyrekall.helpers.crypto.md5(self.raw_pe), 'X')
 
         # Other fields
         #self.sub_system_major_version = int(process.SubSystemMajorVersion)
@@ -143,7 +143,7 @@ class Process(pyrekall.models.common.AbstractWrapper):
             'physical_offset': self.physical_offset,
             'number_of_active_threads': self.number_of_active_threads,
             'number_of_handles': self.number_of_handles,
-            'command_line_arguments': self.command_line,
+            'arguments': self.command_line,
             'current_directory': self.current_directory,
             'environment_variables': self.environment_variables,
             'handles': handles,

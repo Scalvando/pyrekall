@@ -11,16 +11,14 @@ class Dll(pyrekall.models.common.AbstractWrapper):
 
         self.name = str(dll.BaseDllName)
         self.path = str(dll.FullDllName)
-        self.base = hex(dll.DllBase)
+        self.base = format(dll.DllBase,'X')
         self.size = pyrekall.helpers.usability.sizeof_fmt(dll.SizeOfImage)
 
     def summary(self):
-        summary = {
+        return {
             'name': self.name,
             'path': self.path,
             'size': self.size,
-            'base': self.base,
+            'base_address': self.base,
         }
-        if self.flags['human_readable']:
-            summary['size'] = pyrekall.helpers.usability.sizeof_fmt(summary['size'])
-        return summary
+    

@@ -10,23 +10,29 @@ class Connection(pyrekall.models.common.AbstractWrapper):
     def __init__(self, connection):
         super(Connection, self).__init__()
 
-        self.offset = hex(connection[0])
+        self.offset = format(connection[0], 'X')
         self.protocol = utils.SmartStr(connection[1])
-        self.local_addr = utils.SmartStr(connection[2])
-        self.remote_addr = utils.SmartStr(connection[3])
+        laddr = utils.SmartStr(connection[2]).rsplit(':', 1)
+        self.local_addr = laddr[0]
+        self.local_port = laddr[1]
+        raddr = utils.SmartStr(connection[3]).rsplit(':', 1)
+        self.remote_addr = raddr[0]
+        self.remote_port = raddr[1]
         self.state = utils.SmartStr(connection[4])
-        self.pid = utils.SmartStr(connection[5])
+        self.pid = int(connection[5])
         self.owner = utils.SmartStr(connection[6])
         self.created = connection[7].as_datetime().isoformat() or None
 
     def summary(self):
         return {
-            'offset': self.offset,
+            'physical_offset': self.offset,
             'protocol': self.protocol,
-            'local_addr': self.local_addr,
-            'remote_addr': self.remote_addr,
+            'local_address': self.local_addr,
+            'local_port': self.local_port,
+            'remote_address': self.remote_addr,
+            'remote_port': self.remote_port,
             'state': self.state,
             'pid': self.pid,
-            'owner': self.owner,
-            'created': self.created
+            'process_name': self.owner,
+            'creation_time': self.created
         }

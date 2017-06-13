@@ -14,8 +14,8 @@ class Handle(pyrekall.models.common.AbstractWrapper):
 
         self.type = str(handle_type)
         self.details = utils.SmartStr(details)
-        self.handle = hex(handle.HandleValue)
-        self.access = hex(handle.GrantedAccess)
+        self.handle = format(handle.HandleValue, 'X')
+        self.access = format(handle.GrantedAccess, 'X')
         self.pid = int(process.pid)
 
     def summary(self):

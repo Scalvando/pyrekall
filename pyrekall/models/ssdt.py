@@ -8,8 +8,8 @@ class SSDT(pyrekall.models.common.AbstractWrapper):
     def __init__(self, ssdt):
         super(SSDT, self).__init__()
         
-        self.entry = hex(ssdt['entry'])
-        self.target = hex(ssdt['target'])
+        self.entry = int(ssdt['entry'])
+        self.target = format(ssdt['target'], 'X')
         self.symbol = str(ssdt['symbol'])
 
     def summary(self):

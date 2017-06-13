@@ -11,8 +11,8 @@ class DnsCache(pyrekall.models.common.AbstractWrapper):
         self.name = str(dns['Name'])
         self.type = str(dns['type'])
         self.data = str(dns['data'] if 'data' in dns else '')
-        self.record = hex(dns['record'].obj_offset)
-        self.parent = hex(parentRecord.obj_offset) if parentRecord is not None else None
+        self.record = format(dns['record'].obj_offset, 'X')
+        self.parent = format(parentRecord.obj_offset, 'X') if parentRecord is not None else None
 
     def summary(self):
         summary = {

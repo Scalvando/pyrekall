@@ -22,7 +22,7 @@ class HiddenProc(Process):
         summary['csrss'] = self.csrss
         summary['psp_cid_table'] = self.pspCidTable
         summary['sessions'] = self.sessions
-        summary['handles'] = self.handles
+        summary['is_handles'] = self.handles
         summary['psscan'] = self.psscan
         summary['thrdproc'] = self.thrdproc
 

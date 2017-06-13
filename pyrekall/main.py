@@ -89,61 +89,61 @@ if __name__ == "__main__":
             result['sample'] = sample.summary(all=args.all)
 
         if args.users:
-            result['users'] = list(map(lambda x: x.summary(), sample.get_users()))
+            result['user'] = list(map(lambda x: x.summary(), sample.get_users()))
 
         if args.processes:
-            result['processes'] = list(map(lambda x: x.summary(), sample.get_processes()))
+            result['processe'] = list(map(lambda x: x.summary(), sample.get_processes()))
 
         if args.services:
-            result['services'] = list(map(lambda x: x.summary(), sample.get_services()))
+            result['service'] = list(map(lambda x: x.summary(), sample.get_services()))
 
         if args.connections:
-            result['connections'] = [x.summary() for x in sample.get_connections()]
+            result['connection'] = [x.summary() for x in sample.get_connections()]
 
         if args.mft:
-            result['mft'] = [x.summary() for x in sample.get_mft()]
+            result['mft_entry'] = [x.summary() for x in sample.get_mft()]
         
         if args.files:
-            result['files'] = [x.summary() for x in sample.get_files()]
+            result['pooled_file'] = [x.summary() for x in sample.get_files()]
         
         if args.drivers:
-            result['drivers'] = [x.summary() for x in sample.get_drivers()]
+            result['driver'] = [x.summary() for x in sample.get_drivers()]
         
         if args.ssdt:
-            result['ssdt'] = [x.summary() for x in sample.get_ssdt()]
+            result['ssdt_entry'] = [x.summary() for x in sample.get_ssdt()]
         
         if args.threads:
-            result['threads'] = [x.summary() for x in sample.get_threads()]
+            result['thread'] = [x.summary() for x in sample.get_threads()]
 
         if args.tokens:
-            result['tokens'] = [x.summary() for x in sample.get_tokens()]
+            result['token'] = [x.summary() for x in sample.get_tokens()]
         
         if args.unlinked_dlls:
-            result['unlinked_dlls'] = [x.summary() for x in sample.get_unlinked_dlls()]
+            result['unlinked_dll'] = [x.summary() for x in sample.get_unlinked_dlls()]
         
         if args.kernel_modules:
-            result['kernel_modules'] = [x.summary() for x in sample.get_kernel_modules()]
+            result['kernel_module'] = [x.summary() for x in sample.get_kernel_modules()]
         
         if args.kernel_timers:
-            result['kernel_timers'] = [x.summary() for x in sample.get_kernel_timers()]
+            result['kernel_timer'] = [x.summary() for x in sample.get_kernel_timers()]
         
         if args.registry_keys:
-            result['registry_keys'] = sample.get_registry_keys().summary()
+            result['registry_key'] = sample.get_registry_keys().summary()
         
         if args.shimcache:
-            result['shimcache'] = [x.summary() for x in sample.get_shimcache()]
+            result['shimcache_entry'] = [x.summary() for x in sample.get_shimcache()]
 
         if args.dns_cache:
             result['dns_cache'] = list(map(lambda x: x.summary(), sample.get_dns_cache()))
         
         if args.symlinks:
-            result['symlinks'] = list(map(lambda x: x.summary(), sample.get_symlinks()))
+            result['symlink'] = list(map(lambda x: x.summary(), sample.get_symlinks()))
 
         if args.importfunc:
-            result['importfunc'] = list(map(lambda x: x.summary(), sample.get_importfunc()))
+            result['imported_function'] = list(map(lambda x: x.summary(), sample.get_importfunc()))
 
         if args.hiddenproc:
-            result['hiddenproc'] = list(map(lambda x: x.summary(), sample.get_hiddenproc()))
+            result['hidden_process'] = list(map(lambda x: x.summary(), sample.get_hiddenproc()))
 
 
     if args.quiet:
@@ -154,6 +154,15 @@ if __name__ == "__main__":
         with open(args.output.name, 'w+') as f:
             for artifact in result:
                 for item in result[artifact]:
+                    item['_type'] = artifact
+
+                    if 'creation_time' in item:
+                        item['timestamp'] = item['creation_time']
+                    elif 'last_modified' in item:
+                        item['timestamp'] = item['last_modified']
+                    elif 'last_write' in item:
+                        item['timestamp'] = item['last_write']
+
                     f.write('{}\n'.format(json.dumps(item)))
     else:
         print(result)
