@@ -1,5 +1,6 @@
 import pyrekall.models.common
 
+from rekall import utils
 
 class SymLink(pyrekall.models.common.AbstractWrapper):
     """
@@ -8,9 +9,9 @@ class SymLink(pyrekall.models.common.AbstractWrapper):
     def __init__(self, symlink):
         super(SymLink, self).__init__()
 
-        self.a = str(symlink['a'])
-        self.from_link = str(symlink['from_link'])
-        self.to_link = str(symlink['to_link'])
+        self.a = utils.SmartStr(symlink['a'])
+        self.from_link = utils.SmartStr(symlink['from_link'])
+        self.to_link = utils.SmartStr(symlink['to_link'])
         self.ptr_no = int(symlink['ptr_no'])
         self.creation_time = symlink['creation_time'].as_datetime().isoformat() or None
         self.hnd_no = int(symlink['hnd_no'])

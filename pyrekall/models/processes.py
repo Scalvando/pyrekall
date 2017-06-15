@@ -69,9 +69,19 @@ class Process(pyrekall.models.common.AbstractWrapper):
         :return: a dictionary of process environment variables
         """
         environment_variables = {}
+        old_key = ''
         for x in self.peb.ProcessParameters.Environment:
-            k, v = str(x).split("=", 1)
-            environment_variables[k] = v
+            if '=' in str(x):
+                k, v = str(x).split("=", 1)
+
+                if k == '':
+                    k, v = str(v).split("=", 1)
+                    
+                old_key = k
+                environment_variables[k] = v
+            else:
+                environment_variables[old_key] += str(x)
+            
         return environment_variables
 
     def get_handles(self):

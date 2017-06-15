@@ -92,7 +92,7 @@ if __name__ == "__main__":
             result['user'] = list(map(lambda x: x.summary(), sample.get_users()))
 
         if args.processes:
-            result['processe'] = list(map(lambda x: x.summary(), sample.get_processes()))
+            result['process'] = list(map(lambda x: x.summary(), sample.get_processes()))
 
         if args.services:
             result['service'] = list(map(lambda x: x.summary(), sample.get_services()))
@@ -162,7 +162,7 @@ if __name__ == "__main__":
                         item['timestamp'] = item['last_modified']
                     elif 'last_write' in item:
                         item['timestamp'] = item['last_write']
-
+                   
                     f.write('{}\n'.format(json.dumps(item)))
     else:
         print(result)

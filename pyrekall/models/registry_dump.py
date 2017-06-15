@@ -47,10 +47,11 @@ class RegistryDump(pyrekall.models.common.AbstractWrapper):
                     value_entry['value'] = " ".join(["{0:02X}".format(ord(x)) for x in value.DecodedData])
 
             values.append(value_entry)
-
+        
+        key_entry['number_of_values'] = len(values)
         if len(values) == 0:
             values = None
-        key_entry['number_of_values'] = len(values)
+        
         key_entry['values'] = values
         self.keys.append(key_entry)
         #Spider through the subkeys

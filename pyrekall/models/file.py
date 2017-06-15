@@ -23,7 +23,7 @@ class File(pyrekall.models.common.AbstractWrapper):
             'physical_offset': self.physical_offset,
             'number_of_pointers': self.ptr_count,
             'number_of_handles': self.hnd_count,
-            'access': self.access,
+            'file_access': self.access,
             'pid': self.pid,
             'path': self.path
         }
