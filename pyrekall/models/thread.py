@@ -22,7 +22,7 @@ class Thread(pyrekall.models.common.AbstractWrapper):
         return {
             'physical_offset': self.offset,
             'pid': self.pid,
-            'tid': self.tid,
+            'thread_id': self.tid,
             'start_address': self.start_address,
             'creation_time': self.create_time,
             'exit_time': self.exit_time,

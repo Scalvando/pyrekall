@@ -142,10 +142,10 @@ class Process(pyrekall.models.common.AbstractWrapper):
             dlls = list(map(lambda x: x.summary(), self.dlls))
 
         return {
-            'name': self.name,
+            'process_name': self.name,
             'path': self.path,
             'pid': self.pid,
-            'ppid': self.ppid,
+            'parent_pid': self.ppid,
             'md5': self.md5,
             'sha1': self.sha1,
             'sha256': self.sha256,
