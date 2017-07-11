@@ -45,11 +45,11 @@ class Service(pyrekall.models.common.AbstractWrapper):
             k = pyrekall.helpers.usability.camelcase_to_snakecase(value.Name.v())
             v = value.DecodedData
 
-            if value.Type == 'reg_binary':
+            if value.Type == "REG_BINARY":
                 continue
 
             if isinstance(v, list):
-                v = list(filter(lambda x: x, v))
+                v = [x for x in v if x]
 
             if k == "type":
                 v = Services.SERVICE_TYPE.get(v, v)

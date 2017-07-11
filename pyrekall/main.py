@@ -162,7 +162,8 @@ if __name__ == "__main__":
                         item['timestamp'] = item['last_modified']
                     elif 'last_write' in item:
                         item['timestamp'] = item['last_write']
-                   
+                    else:
+                        item['timestamp'] = '1970-01-01T00:00:00Z'
                     f.write('{}\n'.format(json.dumps(item)))
     else:
         print(result)
